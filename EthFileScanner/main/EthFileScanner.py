@@ -3,13 +3,13 @@ Created on Dec 12, 2019
 
 @author: Daniel
 '''
-from web3 import Web3, HTTPProvider
 import os, sys
 
+from web3 import Web3, HTTPProvider
+
+
 #TODO implement a configuration file
-
-
-version = "1.1.1"
+version = "1.1.2"
 #Required variables
 httpAddress = "http://127.0.0.1:8545"
 
@@ -32,9 +32,9 @@ def checkNode():
     else:
         print("Node is not connected properly. Please try changing the address or checking that your node's HTTP functionality is turned on")
         return 1
-    if(not w3.eth.syncing):
+    if(w3.eth.syncing):
         #TODO find a way to identify the most current block
-        print("Warning! Node is not fully synced. Data may not be current. Block height is at: ", w3.eth.blockNumber, " Expected: ", "TODO")
+        print("Warning! Node is not fully synced. Data may not be current. Block height is at: ", w3.eth.syncing.currentBlock, " Expected: ", w3.eth.syncing.highestBlock)
     return 0;
 
 '''
@@ -45,8 +45,11 @@ Parameters
     verbose: Indicates how much detail you want in the console
 '''
 def displayInfo(blockNum, verbose=0):
-    if(verbose < 2):
+    if(verbose <= 2):
         print('Block: ', blockNum)
+    if(verbose <= 1):
+        pass
+    if(verbose == 0):
         print('Transactions: ', w3.eth.getBlock(blockNum).transactions)
     #TODO Implement further debugging information
 
@@ -90,7 +93,7 @@ def checkForFile(data):
     prefixes = []
     fileType = "None"
     for i in sizesOfPrefixes:
-        prefixes.append(data.toString(2, i + 2))
+        prefixes.append(data[2:(i + 2 - len(data))])
     for i in prefixes:
         if(not filePrefixes.get(i, "None") == "None"):
             fileType = filePrefixes.get(i, "ERROR!")
@@ -124,18 +127,20 @@ if __name__ == '__main__':
         sys.exit()
     if(not os.path.exists(topDir)):
         os.mkdir(topDir)
-        
-    startingBlock = 0
+    
+    startingBlock = 1000000
     #TODO, accurately determine number of blocks to parse
-    numberOfBlocks = 8000000
+    numberOfBlocks = 2000000
     
     for i in range(startingBlock, startingBlock+numberOfBlocks):
+        if(i % 1000 == 0):
+            displayInfo(i, verbose=2)
         for transactionHash in w3.eth.getBlock(i).transactions:
             inputData = w3.eth.getTransaction(transactionHash).input
             #If no input assigned to transaction don't bother scanning it for file info
             if(not inputData == '0x'):
                 fileType = checkForFile(inputData)
-                if(not fileType == ""):
+                if(not fileType == "None"):
                     print(fileType, " ", inputData)
                     fileName = str((transactionHash.hex())) + '.' + str(fileType)
                     print(fileName)
