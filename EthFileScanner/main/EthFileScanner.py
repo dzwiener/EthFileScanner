@@ -1,11 +1,12 @@
 '''
 Created on Dec 12, 2019
 
-@author: Daniel
+@author: Daniel Zwiener
 '''
 import os, sys
 
 from web3 import Web3, HTTPProvider
+from FileTypeLoader import FileTypeLoader
 
 
 #TODO implement a configuration file
@@ -46,12 +47,13 @@ Parameters
 '''
 def displayInfo(blockNum, verbose=0):
     if(verbose <= 2):
-        print('Block: ', blockNum)
+        pass
     if(verbose <= 1):
+        print('Block: ', blockNum)
         pass
     if(verbose == 0):
         print('Transactions: ', w3.eth.getBlock(blockNum).transactions)
-    #TODO Implement further debugging information
+        pass
 
 '''
 Purpose
@@ -59,23 +61,9 @@ Purpose
     Also sizeOfPrefixes is used to grab subStrings of data to avoid redundancy
 '''
 def initalizeFileCheck():
-    filePrefixes = dict([
-        ("ffd8", "jpeg"),
-        ("ffe", "mp3"),
-        ("fff", "mp3"),
-        ("504b", "zip"),
-        ("89504e470d0a1a0a", "png"),
-        ("25504446", "pdf"),
-        ("47494638", "gif"),
-        ("4d5a", "exe"),
-        ("526172211a07", "rar"),
-        ("efbbbf", "txt"),
-        ("4e45531a", "nes"),
-        ("7b5c72746631", "rtf")
-        ])
-    for i in filePrefixes.keys():
-        sizesOfPrefixes.add(i.__len__())
-
+    fileLoader = FileTypeLoader("fileTypes.json")
+    filePrefixes = fileLoader.getTypeDict()
+    sizeOfprefixes = fileLoader.getSizeSet()
 
 '''
 Purpose
@@ -95,7 +83,7 @@ def checkForFile(data):
     for i in sizesOfPrefixes:
         prefixes.append(data[2:(i + 2 - len(data))])
     for i in prefixes:
-        if(not filePrefixes.get(i, "None") == "None"):
+        if(not filePrefixes.get(i, fileType) == fileType):
             fileType = filePrefixes.get(i, "ERROR!")
     return fileType
 
@@ -125,16 +113,19 @@ if __name__ == '__main__':
     if(checkNode() == 1):
         print("GoodBye")
         sys.exit()
-    if(not os.path.exists(topDir)):
-        os.mkdir(topDir)
     
-    startingBlock = 1000000
+    startingBlock  = 1000000
     #TODO, accurately determine number of blocks to parse
-    numberOfBlocks = 2000000
+    numberOfBlocks = 5000000
     
+    #Goes through each block in the range provided
     for i in range(startingBlock, startingBlock+numberOfBlocks):
+        
+        #Reports constantly on the scanning for files
         if(i % 1000 == 0):
             displayInfo(i, verbose=2)
+        
+        #Goes through each transaction in this block
         for transactionHash in w3.eth.getBlock(i).transactions:
             inputData = w3.eth.getTransaction(transactionHash).input
             #If no input assigned to transaction don't bother scanning it for file info
