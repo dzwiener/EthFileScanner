@@ -13,7 +13,7 @@ from web3.providers.ipc import IPCProvider
 #TODO implement a configuration file
 version = "1.1.2"
 #Required variables
-httpAddress = "http://127.0.0.1:8545"
+# httpAddress = "http://127.0.0.1:8545"
 
 w3 = Web3(IPCProvider())
 hexEncoding = "ISO-8859-1"
