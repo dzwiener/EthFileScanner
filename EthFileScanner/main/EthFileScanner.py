@@ -7,6 +7,7 @@ import os, sys
 
 from web3 import Web3, HTTPProvider
 from FileTypeLoader import FileTypeLoader
+from web3.providers.ipc import IPCProvider
 
 
 #TODO implement a configuration file
@@ -14,12 +15,10 @@ version = "1.1.2"
 #Required variables
 httpAddress = "http://127.0.0.1:8545"
 
-w3 = Web3(HTTPProvider(httpAddress))
+w3 = Web3(IPCProvider())
 hexEncoding = "ISO-8859-1"
 
 topDir = "EthFiles"
-
-filePrefixes = dict()
 sizesOfPrefixes = set()
 
 """
@@ -47,23 +46,14 @@ Parameters
 '''
 def displayInfo(blockNum, verbose=0):
     if(verbose <= 2):
-        pass
-    if(verbose <= 1):
         print('Block: ', blockNum)
         pass
-    if(verbose == 0):
-        print('Transactions: ', w3.eth.getBlock(blockNum).transactions)
+    if(verbose <= 1):
+        print('Transactions: ', len(w3.eth.getBlock(blockNum).transactions))
         pass
-
-'''
-Purpose
-    Fills a dict with each prefix for a file type and assigns the file type to that prefix
-    Also sizeOfPrefixes is used to grab subStrings of data to avoid redundancy
-'''
-def initalizeFileCheck():
-    fileLoader = FileTypeLoader("fileTypes.json")
-    filePrefixes = fileLoader.getTypeDict()
-    sizeOfprefixes = fileLoader.getSizeSet()
+    if(verbose == 0):
+        
+        pass
 
 '''
 Purpose
@@ -83,8 +73,8 @@ def checkForFile(data):
     for i in sizesOfPrefixes:
         prefixes.append(data[2:(i + 2 - len(data))])
     for i in prefixes:
-        if(not filePrefixes.get(i, fileType) == fileType):
-            fileType = filePrefixes.get(i, "ERROR!")
+        if(not fileLoader.getTypeDict().get(i, fileType) == fileType):
+            fileType = fileLoader.getTypeDict().get(i, "ERROR!")
     return fileType
 
 '''
@@ -109,7 +99,7 @@ def printByteToFile(byteString, fileName, block):
 
 if __name__ == '__main__':
     print(version)
-    initalizeFileCheck()
+    fileLoader = FileTypeLoader("fileTypes.json")
     if(checkNode() == 1):
         print("GoodBye")
         sys.exit()
@@ -118,12 +108,13 @@ if __name__ == '__main__':
     #TODO, accurately determine number of blocks to parse
     numberOfBlocks = 5000000
     
+    print("Starting Scan")
     #Goes through each block in the range provided
     for i in range(startingBlock, startingBlock+numberOfBlocks):
-        
+#         print(i)
         #Reports constantly on the scanning for files
         if(i % 1000 == 0):
-            displayInfo(i, verbose=2)
+            displayInfo(i, verbose=1)
         
         #Goes through each transaction in this block
         for transactionHash in w3.eth.getBlock(i).transactions:
