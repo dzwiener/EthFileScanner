@@ -20,6 +20,12 @@ hexEncoding = "ISO-8859-1"
 topDir = "EthFiles"
 sizesOfPrefixes = set()
 
+#Counters:
+numberOfBlocks = 0
+numberOfTransactions = 0
+numberOfDataTransactions = 0
+numberOfFiles = 0
+
 """
 Purpose
     Checks if the node is ready to start parsing for files
@@ -45,10 +51,10 @@ Parameters
 '''
 def displayInfo(blockNum, verbose=0):
     if(verbose <= 2):
-        print('Block: ', blockNum)
+        print("Blocks scanned so far: " + str(numberOfBlocks) + " Currently scanning block: " + str(blockNum))
         pass
     if(verbose <= 1):
-        print('Transactions: ', len(w3.eth.getBlock(blockNum).transactions))
+        print("Transactions so far: " + str(numberOfTransactions) + " Files So far: " + str(numberOfFiles) + " Transactions with data so far: " + str(numberOfDataTransactions))
         pass
     if(verbose == 0):
         
@@ -106,13 +112,13 @@ if __name__ == '__main__':
         print("GoodBye")
         sys.exit()
     
-    startingBlock  = 0
+    startingBlock  = 1252000
     #TODO, accurately determine number of blocks to parse
-    numberOfBlocks = 10000000
+    numberOfBlocksToScan = 9000000
     
     print("Starting Scan")
     #Goes through each block in the range provided
-    for i in range(startingBlock, startingBlock+numberOfBlocks):
+    for i in range(startingBlock, startingBlock+numberOfBlocksToScan):
         #Reports constantly on the scanning for files
         if(i % 1000 == 0):
             displayInfo(i, verbose=1)
@@ -128,4 +134,8 @@ if __name__ == '__main__':
                     fileName = str((transactionHash.hex())) + '.' + str(fileType)
                     print(fileName)
                     printByteToFile(inputData, fileName, i)
+                    numberOfFiles = numberOfFiles + 1
+                numberOfDataTransactions = numberOfDataTransactions + 1
+            numberOfTransactions = numberOfTransactions + 1
+        numberOfBlocks = numberOfBlocks + 1
     pass
