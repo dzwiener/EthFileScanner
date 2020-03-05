@@ -37,7 +37,7 @@ class FileTypeLoader(object):
         print("Init")
         self.__path = pathToJson
         self.__initJsonData()
-        
+        self.__detLen()
         
     def getTypeDict(self):
         return self.__fileTypeDict

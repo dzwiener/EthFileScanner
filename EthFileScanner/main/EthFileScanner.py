@@ -11,10 +11,9 @@ from web3.providers.ipc import IPCProvider
 
 
 #TODO implement a configuration file
-version = "1.1.2"
-#Required variables
-# httpAddress = "http://127.0.0.1:8545"
+version = "1.2.0"
 
+#Required variables
 w3 = Web3(IPCProvider())
 hexEncoding = "ISO-8859-1"
 
@@ -70,8 +69,8 @@ def checkForFile(data):
     """
     prefixes = []
     fileType = "None"
-    for i in sizesOfPrefixes:
-        prefixes.append(data[2:(i + 2 - len(data))])
+    for i in sizeOfPrefixes:
+        prefixes.append(data[2:(i + 2)])
     for i in prefixes:
         if(not fileLoader.getTypeDict().get(i, fileType) == fileType):
             fileType = fileLoader.getTypeDict().get(i, "ERROR!")
@@ -100,6 +99,7 @@ def printByteToFile(byteString, fileName, block):
 if __name__ == '__main__':
     print(version)
     fileLoader = FileTypeLoader("fileTypes.json")
+    sizeOfPrefixes = fileLoader.getSizeSet()
     if(checkNode() == 1):
         print("GoodBye")
         sys.exit()

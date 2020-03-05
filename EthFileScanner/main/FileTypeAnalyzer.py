@@ -12,7 +12,7 @@ class FileTypeAnalyzer(object):
     classdocs
     '''
     __initString = ""
-    
+    __fileType = "None"
     
     
     def __init__(self, data):
