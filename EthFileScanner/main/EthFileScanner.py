@@ -87,6 +87,8 @@ Parameters
 def printByteToFile(byteString, fileName, block):
     dirPath = topDir + "/" + str(block)
     path = dirPath + '/' + str(fileName)
+    if(not os.path.exists(topDir)):
+        os.mkdir(topDir)
     
     if(not os.path.exists(dirPath)):
         os.mkdir(dirPath)
@@ -104,14 +106,13 @@ if __name__ == '__main__':
         print("GoodBye")
         sys.exit()
     
-    startingBlock  = 1000000
+    startingBlock  = 0
     #TODO, accurately determine number of blocks to parse
-    numberOfBlocks = 5000000
+    numberOfBlocks = 10000000
     
     print("Starting Scan")
     #Goes through each block in the range provided
     for i in range(startingBlock, startingBlock+numberOfBlocks):
-#         print(i)
         #Reports constantly on the scanning for files
         if(i % 1000 == 0):
             displayInfo(i, verbose=1)
