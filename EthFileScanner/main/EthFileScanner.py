@@ -50,16 +50,16 @@ Parameters
     verbose: Indicates how much detail you want in the console
 '''
 def displayInfo(blockNum, verbose=0):
+    output = '[INFO] '
     if(verbose <= 2):
-        print("Blocks scanned so far: " + str(numberOfBlocks) + " Currently scanning block: " + str(blockNum))
-        pass
+#         output = output, "Blocks scanned so far: ", numberOfBlocks, " Currently scanning block: ", blockNum
+        output = output + 'Blocks scanned so far: %010d Currently scanning block: %010d ' % (numberOfBlocks, blockNum)
     if(verbose <= 1):
-        print("Transactions so far: " + str(numberOfTransactions) + " Files So far: " + str(numberOfFiles) + " Transactions with data so far: " + str(numberOfDataTransactions))
-        pass
+#         output = output, "Transactions so far: ", numberOfTransactions, "Files So far: ", numberOfFiles, "Transactions with data so far: ", numberOfDataTransactions
+        output = output + 'Transactions so far: %010d Files So far: %010d Transactions with data so far:  %010d' % (numberOfTransactions, numberOfFiles, numberOfDataTransactions)
     if(verbose == 0):
-        
         pass
-
+    print(output)
 '''
 Purpose
     Uses the dict established in initalizeFileCheck and sees if data matches the patterns in the dict
@@ -112,15 +112,15 @@ if __name__ == '__main__':
         print("GoodBye")
         sys.exit()
     
-    startingBlock  = 1252000
+    startingBlock  = 0
     #TODO, accurately determine number of blocks to parse
-    numberOfBlocksToScan = 9000000
+    numberOfBlocksToScan = 10000000
     
     print("Starting Scan")
     #Goes through each block in the range provided
     for i in range(startingBlock, startingBlock+numberOfBlocksToScan):
         #Reports constantly on the scanning for files
-        if(i % 1000 == 0):
+        if(i % 100 == 0):
             displayInfo(i, verbose=1)
         
         #Goes through each transaction in this block
@@ -130,9 +130,8 @@ if __name__ == '__main__':
             if(not inputData == '0x'):
                 fileType = checkForFile(inputData)
                 if(not fileType == "None"):
-                    print(fileType, " ", inputData)
                     fileName = str((transactionHash.hex())) + '.' + str(fileType)
-                    print(fileName)
+                    print("[FILE]", fileName, " ", inputData, " ", fileType)
                     printByteToFile(inputData, fileName, i)
                     numberOfFiles = numberOfFiles + 1
                 numberOfDataTransactions = numberOfDataTransactions + 1
